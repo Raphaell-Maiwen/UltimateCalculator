@@ -1,0 +1,251 @@
+//Specs:
+//No implicit multiplication, such as "3(2 +5)", which would normally be read as "3 * (2 + 5)".
+
+//TODO: Accept negative numbers.
+package ultimate.calculator;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ *
+ * @author Rafiki
+ */
+
+//https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+public class UltimateCalculator {
+    
+    public static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+    public static String readString()
+    {
+        try
+        {
+            return br.readLine().toLowerCase();
+        }
+        catch(IOException e)
+        {
+            return "Error.";
+        }
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        String formule = "";
+        int order;
+        int index = 0;
+        char operator = ' ';
+        double result = 0;
+        boolean valid = false;
+        
+        System.out.println("Welcome to the Ultimate Calculator Program!");
+        while(true){
+            order = 7;
+            formule = readString();
+            
+            if(formule.contains("q")){
+                System.out.println("Goodbye!");
+                System.exit(0);
+            }
+            
+            //Remove all whitespaces.
+            formule = formule.replaceAll("\\s", "");
+            
+            //Replace ',' by '.' to make sure double are in a good format.
+            formule = formule.replaceAll(",", ".");
+            
+            //Verify that all characters are valid.
+            for(int i = 0; i < formule.length(); i++){
+                valid = isValidSymbol(formule.charAt(i));
+                if(valid == false){
+                    System.out.println("It is not a valid operation.");
+                    break;
+                }
+            }
+
+            //Verifying what operation will be done first.
+            if(valid){
+                while(formule.contains("+") || formule.contains("-") || formule.contains("*") ||
+                        formule.contains("/") || formule.contains("%")){
+                    String nbr1 = "";
+                    String nbr2 = "";
+                    String nbr1Temp = "";
+                    for(int i = 0; i < formule.length(); i++){
+                        /*if(formule.charAt(i) == '('){
+                            order = 1;
+                        }*/
+                        if(formule.charAt(i) == '*' || formule.charAt(i) == '/' 
+                                || formule.charAt(i) == '%'){
+                            if(order > 3){
+                                order = 3;
+                                operator = formule.charAt(i);
+                                index = i;
+                            }
+                            
+                        }
+                        else if(formule.charAt(i) == '+' || formule.charAt(i) == '-'){
+                            if(order > 4){
+                                order = 4;
+                                operator = formule.charAt(i);
+                                index = i;
+                            }
+                        }
+                        else{
+
+                        }
+                    }
+                    
+                    //Get the first operand. The numbers are taken "à l'envers"(?).
+                    for(int i = index - 1; i >= 0; i--){
+                        if(!isOperator(formule.charAt(i))){
+                            nbr1 += formule.charAt(i);
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    
+                    //Reverse the operand so it is the right way. 
+                    for(int i = nbr1.length() - 1; i >= 0; i--){
+                        nbr1Temp += nbr1.charAt(i);
+                    }
+
+                    nbr1 = nbr1Temp;
+
+                    for(int i = index + 1; i < formule.length(); i++){
+                        if(isOperator(formule.charAt(i))){
+                            break;
+                        }
+                        else{
+                            nbr2 += formule.charAt(i);
+                        }
+                    }
+                    
+                    
+                    if(order == 1){
+                        //Set up a boolean for parentheses?
+                    }
+                    else if(order == 2){
+                        //How to recognize power? '^' probably
+                    }
+                    else if(order == 3){
+                        if(operator == '*'){
+                            result = multiplication(nbr1, nbr2);
+                        }
+                        else if(operator == '/'){
+                            result = division(nbr1, nbr2);
+                        }
+                        else if(operator == '%'){
+                            result = modulo(nbr1, nbr2);
+                        }
+                    }
+                    else if(order == 4){
+                        if(operator == '+'){
+                            result = addition(nbr1, nbr2);
+                        }
+                        else if(operator == '-'){
+                            result = substraction(nbr1, nbr2);
+                        }
+                    }
+                    else if(order == 5){
+
+                    }
+                    else if(order == 6){
+
+                    }
+                    else if(order == 7){
+
+                    }
+                    formule = formule.substring(0, index - nbr1.length()) + result
+                               + formule.substring(index + nbr2.length() + 1);
+                    order = 7;
+                    /*else{
+                        System.out.println("It's not a valid operation.");
+                    }*/
+                }
+            }
+            
+            /*
+             * Print in a double format if there's something after the comma.
+             * Otherwise, print in an int format.
+             */
+            if(result == (int)result){
+                System.out.println((int)result);
+            }
+            else{
+                System.out.println(result);
+            }
+            
+            System.out.println("Next operation: ");
+        }
+    }
+    
+    public static double addition(String nbr1, String nbr2){
+        double result = Double.parseDouble(nbr1) + Double.parseDouble(nbr2);
+        return result;
+    }
+    
+    public static double substraction(String nbr1, String nbr2){
+        double result = Double.parseDouble(nbr1) - Double.parseDouble(nbr2);
+        return result;
+    }
+    
+    public static double multiplication(String nbr1, String nbr2){
+        double result = Double.parseDouble(nbr1) * Double.parseDouble(nbr2);
+        return result;
+    }
+    
+    public static double division(String nbr1, String nbr2){
+        double result = Double.parseDouble(nbr1) / Double.parseDouble(nbr2);
+        return result;
+    }
+    
+    public static double modulo(String nbr1, String nbr2){
+        double result = Double.parseDouble(nbr1) % Double.parseDouble(nbr2);
+        return result;
+    }
+    
+    public static int power(){
+        return 0; //Temporary put there so the program compiles.
+    }
+    
+    //This function will eventually be a root not specifically square.
+    public static int squareRoot(){
+        return 0; //Temporary put there so the program compiles.
+    }
+    
+    public static boolean isValidSymbol(char symbol){
+        if(symbol != '+' && symbol != '-' && symbol != '*' && symbol != '/' &&
+                symbol != '%' && symbol != 'q' && symbol != '.' && !Character.isDigit(symbol)){
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean isOperator(char symbol){
+        if(symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' ||
+                symbol == '%'){
+            return true;
+        }
+        return false;
+    }
+    
+    //public static String
+}
+
+
+//Cemetery:
+
+
+//1. Was used to take the first operand in the multiplication. The operand was
+//taken "à l'endroit" (?), which was convenient but a bit counter-productive.
+//Now, we don't have to get through all the array (optmization, yay!).
+
+/*if(isOperator(formule.charAt(i))){
+    nbr1 = "";
+}
+else{
+    nbr1 += formule.charAt(i);
+}*/
